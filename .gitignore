@@ -1,0 +1,13 @@
+# Compiled executable
+flight_sim
+
+# VS Code configuration
+.vscode/
+
+# macOS files
+.DS_Store
+
+# Common C/C++ build artifacts
+*.o
+*.out
+*.dSYM/
