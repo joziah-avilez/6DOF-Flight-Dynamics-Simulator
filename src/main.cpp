@@ -64,11 +64,6 @@ int main()
     double dt = 0.01;
 
     std::ofstream outputFile("output/simulation.csv");
-    if (!outputFile.is_open())
-    {
-        std::cerr << "Error: could not open output/simulation.csv. Run the simulator from the project root directory.\n";
-        return 1;
-    }
     outputFile << "time,"
                << "x,y,z,"
                << "vx,vy,vz,"

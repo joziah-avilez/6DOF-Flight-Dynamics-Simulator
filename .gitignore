@@ -13,3 +13,5 @@ flight_sim
 *.dSYM/
 
 output/*.csv
+
+build/
