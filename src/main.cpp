@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <fstream>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
@@ -7,7 +8,26 @@
 #include "Dynamics.hpp"
 #include "Integrator.hpp"
 #include "Vehicle.hpp"
+
 #include "Environment.hpp"
+
+void writeState(std::ofstream& outputFile, double t, const State& state)
+{
+    outputFile << t << ","
+               << state.position.x() << ","
+               << state.position.y() << ","
+               << state.position.z() << ","
+               << state.velocity.x() << ","
+               << state.velocity.y() << ","
+               << state.velocity.z() << ","
+               << state.orientation.w() << ","
+               << state.orientation.x() << ","
+               << state.orientation.y() << ","
+               << state.orientation.z() << ","
+               << state.angularVelocity.x() << ","
+               << state.angularVelocity.y() << ","
+               << state.angularVelocity.z() << "\n";
+}
 
 int main() 
 {
@@ -43,23 +63,35 @@ int main()
     double tFinal = 2.0;
     double dt = 0.1;
 
+    std::ofstream outputFile("output/simulation.csv");
+    if (!outputFile.is_open())
+    {
+        std::cerr << "Error: could not open output/simulation.csv. Run the simulator from the project root directory.\n";
+        return 1;
+    }
+    outputFile << "time,"
+               << "x,y,z,"
+               << "vx,vy,vz,"
+               << "qw,qx,qy,qz,"
+               << "wx,wy,wz\n";
+
+    writeState(outputFile, t, state);
+
     while (t < tFinal)
     {
         state = rk4Step(state, vehicle, environment, dt);
-        Eigen::Vector3d thrustDirection = state.orientation * Eigen::Vector3d::UnitZ();
-        double rotationalEnergy = 0.5 * state.angularVelocity.transpose() * vehicle.inertia * state.angularVelocity;
-        double angularMomentumMagnitude = (vehicle.inertia * state.angularVelocity).norm();
         t += dt;
 
-        std::cout << "\nt = " << t << " s\n"
-                  << "  Position [m]          : " << state.position.transpose() << "\n"
-                  << "  Velocity [m/s]        : " << state.velocity.transpose() << "\n"
-                  << "  Thrust direction      : " << thrustDirection.transpose() << "\n"
-                  << "  Angular velocity [rad/s]: " << state.angularVelocity.transpose() << "\n"
-                  << "  Rotational energy [J]: " << rotationalEnergy << "\n"
-                  << "  Angular momentum [kg*m^2/s]: " << angularMomentumMagnitude << "\n";
+        writeState(outputFile, t, state);
+
     }
 
+    outputFile.close();
+
+    std::cout << "Simulation complete.\n"
+              << "Duration: " << tFinal << " s\n"
+              << "Time step: " << dt << " s\n"
+              << "Results written to output/simulation.csv\n";
 
     return 0;
 }
