@@ -61,7 +61,7 @@ int main()
 
     double t = 0.0;
     double tFinal = 2.0;
-    double dt = 0.1;
+    double dt = 0.01;
 
     std::ofstream outputFile("output/simulation.csv");
     if (!outputFile.is_open())
