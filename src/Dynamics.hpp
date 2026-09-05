@@ -19,6 +19,10 @@ StateDerivative derivatives(const State& state, const Vehicle& vehicle, const En
     Eigen::Vector3d airRelativeVelocity = state.velocity - environment.windVelocity;
     Eigen::Vector3d airRelativeVelocityBody = state.orientation.inverse() * airRelativeVelocity;
 
+    // Calculate dynamic pressure
+    double airSpeed = airRelativeVelocity.norm();
+    double dynamicPressure = 0.5 * airDensity * airSpeed * airSpeed;
+
     // Calculate axial velocity and drag
     double axialVelocity = airRelativeVelocityBody.z();
     double axialDrag = -0.5 * airDensity * vehicle.axialDragCoefficient * vehicle.axialArea * axialVelocity * std::abs(axialVelocity);
@@ -41,8 +45,19 @@ StateDerivative derivatives(const State& state, const Vehicle& vehicle, const En
     Eigen::Vector3d aerodynamicForceBody = axialDragBody + lateralDragBody;
     Eigen::Vector3d aerodynamicForce = state.orientation * aerodynamicForceBody;
 
+    // Calculate torques
     Eigen::Vector3d aerodynamicTorque = vehicle.centerOfPressure.cross(aerodynamicForceBody);
-    Eigen::Vector3d dampingTorque = -vehicle.angularDampingCoefficient * state.angularVelocity;
+    Eigen::Vector3d dampingTorque = Eigen::Vector3d::Zero();
+    // Apply damping torque based on angular velocity and dynamic pressure
+    if (airSpeed > 1e-6)
+    {
+        double pitchYawFactor = dynamicPressure * vehicle.lateralArea * vehicle.referenceLength * vehicle.referenceLength / (2.0 * airSpeed);
+        dampingTorque.x() = -pitchYawFactor * vehicle.pitchYawDampingCoefficient * state.angularVelocity.x();
+        dampingTorque.y() = -pitchYawFactor * vehicle.pitchYawDampingCoefficient * state.angularVelocity.y();
+
+        double rollFactor = dynamicPressure * vehicle.axialArea * vehicle.referenceDiameter * vehicle.referenceDiameter / (2.0 * airSpeed);
+        dampingTorque.z() = -rollFactor * vehicle.rollDampingCoefficient * state.angularVelocity.z();
+    }
 
     // Calculate angular momentum and angular acceleration
     Eigen::Vector3d totalTorque = vehicle.torque + aerodynamicTorque + dampingTorque;
