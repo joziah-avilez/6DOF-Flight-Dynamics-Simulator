@@ -13,19 +13,22 @@ int main()
 {
     State state;
     state.position = Eigen::Vector3d(0.0, 0.0, 100.0);
-    state.velocity = Eigen::Vector3d(10.0, 0.0, 20.0);
-    state.orientation = Eigen::AngleAxisd(30.0 * M_PI / 180.0, Eigen::Vector3d::UnitY());
-    state.angularVelocity = Eigen::Vector3d(0.5, 0.0, 0.5);
+    state.velocity = Eigen::Vector3d(20.0, 0.0, 0.0);
+    state.orientation = Eigen::Quaterniond(Eigen::AngleAxisd(M_PI / 2.0, Eigen::Vector3d::UnitY()));
+    state.angularVelocity = Eigen::Vector3d::Zero();
 
     Environment environment;
     environment.gravity = 9.81;
     environment.airDensity = 1.225;
+    environment.windVelocity = Eigen::Vector3d::Zero();
 
     Vehicle vehicle;
     vehicle.mass = 1000.0;
     vehicle.thrust = 12000.0;
-    vehicle.dragCoefficient = 0.5;
-    vehicle.referenceArea = 1.0;
+    vehicle.axialArea = M_PI * 0.5 * 0.5; // Assuming radius of 0.5 m for the axial area
+    vehicle.lateralArea = 5.0; // Assuming a length of 5 m and width of 1 m for the lateral area
+    vehicle.axialDragCoefficient = 0.5;
+    vehicle.lateralDragCoefficient = 1.0;
     vehicle.inertia << 500.0, 0.0, 0.0,
                         0.0, 500.0, 0.0,
                         0.0, 0.0, 100.0;

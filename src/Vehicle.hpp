@@ -5,8 +5,10 @@ struct Vehicle
 {
     double mass;
     double thrust;
-    double dragCoefficient;
-    double referenceArea;
+    double axialArea;
+    double lateralArea;
+    double axialDragCoefficient;
+    double lateralDragCoefficient;
     Eigen::Matrix3d inertia;
     Eigen::Vector3d torque;
 };
