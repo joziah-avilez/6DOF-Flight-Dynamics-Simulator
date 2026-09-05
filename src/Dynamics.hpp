@@ -34,16 +34,20 @@ StateDerivative derivatives(const State& state, const Vehicle& vehicle, const En
     Eigen::Quaterniond qDot = state.orientation * omegaQuat;
     qDot.coeffs() *= 0.5;
 
-    // Calculate angular momentum and angular acceleration
-    Eigen::Vector3d angularMomentum = vehicle.inertia * state.angularVelocity;
-    Eigen::Vector3d angularAcceleration = vehicle.inertia.inverse() * (vehicle.torque - state.angularVelocity.cross(angularMomentum));
-
     // Calculate forces
     Eigen::Vector3d gravityForce(0, 0, -vehicle.mass * gravity);
     Eigen::Vector3d thrustBody(0, 0, vehicle.thrust);
     Eigen::Vector3d thrustForce = state.orientation * thrustBody;
     Eigen::Vector3d aerodynamicForceBody = axialDragBody + lateralDragBody;
     Eigen::Vector3d aerodynamicForce = state.orientation * aerodynamicForceBody;
+
+    Eigen::Vector3d aerodynamicTorque = vehicle.centerOfPressure.cross(aerodynamicForceBody);
+    Eigen::Vector3d dampingTorque = -vehicle.angularDampingCoefficient * state.angularVelocity;
+
+    // Calculate angular momentum and angular acceleration
+    Eigen::Vector3d totalTorque = vehicle.torque + aerodynamicTorque + dampingTorque;
+    Eigen::Vector3d angularMomentum = vehicle.inertia * state.angularVelocity;
+    Eigen::Vector3d angularAcceleration = vehicle.inertia.inverse() * (totalTorque - state.angularVelocity.cross(angularMomentum));
 
     // Calculate net force
     Eigen::Vector3d netForce = thrustForce + gravityForce + aerodynamicForce;

@@ -14,7 +14,7 @@ int main()
     State state;
     state.position = Eigen::Vector3d(0.0, 0.0, 100.0);
     state.velocity = Eigen::Vector3d(20.0, 0.0, 0.0);
-    state.orientation = Eigen::Quaterniond(Eigen::AngleAxisd(M_PI / 2.0, Eigen::Vector3d::UnitY()));
+    state.orientation = Eigen::Quaterniond::Identity();
     state.angularVelocity = Eigen::Vector3d::Zero();
 
     Environment environment;
@@ -24,7 +24,7 @@ int main()
 
     Vehicle vehicle;
     vehicle.mass = 1000.0;
-    vehicle.thrust = 12000.0;
+    vehicle.thrust = 0.0;
     vehicle.axialArea = M_PI * 0.5 * 0.5; // Assuming radius of 0.5 m for the axial area
     vehicle.lateralArea = 5.0; // Assuming a length of 5 m and width of 1 m for the lateral area
     vehicle.axialDragCoefficient = 0.5;
@@ -32,6 +32,8 @@ int main()
     vehicle.inertia << 500.0, 0.0, 0.0,
                         0.0, 500.0, 0.0,
                         0.0, 0.0, 100.0;
+    vehicle.centerOfPressure = Eigen::Vector3d(0.0, 0.0, -1.0); // Assuming the center of pressure is 1 m behind the center of mass 
+    vehicle.angularDampingCoefficient = 100.0; // N*m*s/rad
     vehicle.torque = Eigen::Vector3d::Zero();
 
     double t = 0.0;

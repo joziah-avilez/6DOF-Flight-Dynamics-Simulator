@@ -9,6 +9,8 @@ struct Vehicle
     double lateralArea;
     double axialDragCoefficient;
     double lateralDragCoefficient;
+    double angularDampingCoefficient;
     Eigen::Matrix3d inertia;
     Eigen::Vector3d torque;
+    Eigen::Vector3d centerOfPressure;
 };
