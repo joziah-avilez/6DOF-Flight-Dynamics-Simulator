@@ -44,7 +44,9 @@ int main()
     environment.windVelocity = Eigen::Vector3d::Zero();
 
     Vehicle vehicle;
-    vehicle.mass = 1000.0; // kg
+    vehicle.initialMass = 1000.0; // kg
+    vehicle.dryMass = 800.0; // kg
+    vehicle.massFlowRate = 40.0; // kg/s
     vehicle.thrust = 12000.0; // N
     vehicle.burnTime = 5.0; // s
     vehicle.referenceLength = 5.0; // m

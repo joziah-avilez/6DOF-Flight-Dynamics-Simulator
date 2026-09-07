@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <cmath>
@@ -15,6 +16,12 @@ StateDerivative derivatives(const State& state, const Vehicle& vehicle, const En
     const double gravity = environment.gravity;
     const double altitude = state.position.z();
     const double airDensity = environment.airDensity(altitude);
+
+    // Calculate current mass based on propellant consumption
+    const double propellantMass = vehicle.initialMass - vehicle.dryMass;
+    const double fuelDepletionTime = propellantMass / vehicle.massFlowRate;
+    const double burnDuration = std::min(vehicle.burnTime, fuelDepletionTime);
+    const double currentMass = std::max(vehicle.dryMass, vehicle.initialMass - vehicle.massFlowRate * std::min(time, burnDuration));
 
     // Calculate air-relative velocity
     Eigen::Vector3d airRelativeVelocity = state.velocity - environment.windVelocity;
@@ -40,8 +47,8 @@ StateDerivative derivatives(const State& state, const Vehicle& vehicle, const En
     qDot.coeffs() *= 0.5;
 
     // Calculate forces
-    Eigen::Vector3d gravityForce(0, 0, -vehicle.mass * gravity);
-    double currentThrust = (time < vehicle.burnTime) ? vehicle.thrust : 0.0;
+    Eigen::Vector3d gravityForce(0, 0, -currentMass * gravity);
+    double currentThrust = (time < burnDuration) ? vehicle.thrust : 0.0;
     Eigen::Vector3d thrustBody(0, 0, currentThrust);
     Eigen::Vector3d thrustForce = state.orientation * thrustBody;
     Eigen::Vector3d aerodynamicForceBody = axialDragBody + lateralDragBody;
@@ -73,7 +80,7 @@ StateDerivative derivatives(const State& state, const Vehicle& vehicle, const En
     StateDerivative dxdt;
 
     dxdt.position = state.velocity;
-    dxdt.velocity = netForce / vehicle.mass;
+    dxdt.velocity = netForce / currentMass;
     dxdt.orientation = qDot;
     dxdt.angularVelocity = angularAcceleration;
 

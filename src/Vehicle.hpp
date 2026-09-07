@@ -3,7 +3,9 @@
 
 struct Vehicle
 {
-    double mass;
+    double initialMass;
+    double dryMass;
+    double massFlowRate;
     double thrust;
     double burnTime;
     double axialArea;
