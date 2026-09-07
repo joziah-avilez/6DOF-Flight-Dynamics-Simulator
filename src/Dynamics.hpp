@@ -23,6 +23,9 @@ StateDerivative derivatives(const State& state, const Vehicle& vehicle, const En
     const double burnDuration = std::min(vehicle.burnTime, fuelDepletionTime);
     const double currentMass = std::max(vehicle.dryMass, vehicle.initialMass - vehicle.massFlowRate * std::min(time, burnDuration));
 
+    const double massRatio = currentMass / vehicle.initialMass;
+    const Eigen::Matrix3d currentInertia = massRatio * vehicle.initialInertia;
+
     // Calculate air-relative velocity
     Eigen::Vector3d airRelativeVelocity = state.velocity - environment.windVelocity;
     Eigen::Vector3d airRelativeVelocityBody = state.orientation.inverse() * airRelativeVelocity;
@@ -70,8 +73,8 @@ StateDerivative derivatives(const State& state, const Vehicle& vehicle, const En
 
     // Calculate angular momentum and angular acceleration
     Eigen::Vector3d totalTorque = vehicle.torque + aerodynamicTorque + dampingTorque;
-    Eigen::Vector3d angularMomentum = vehicle.inertia * state.angularVelocity;
-    Eigen::Vector3d angularAcceleration = vehicle.inertia.inverse() * (totalTorque - state.angularVelocity.cross(angularMomentum));
+    Eigen::Vector3d angularMomentum = currentInertia * state.angularVelocity;
+    Eigen::Vector3d angularAcceleration = currentInertia.inverse() * (totalTorque - state.angularVelocity.cross(angularMomentum));
 
     // Calculate net force
     Eigen::Vector3d netForce = thrustForce + gravityForce + aerodynamicForce;

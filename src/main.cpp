@@ -55,7 +55,7 @@ int main()
     vehicle.lateralArea = vehicle.referenceLength * vehicle.referenceDiameter; // m^2
     vehicle.axialDragCoefficient = 0.5;
     vehicle.lateralDragCoefficient = 1.0;
-    vehicle.inertia << 500.0, 0.0, 0.0,
+    vehicle.initialInertia << 500.0, 0.0, 0.0,
                         0.0, 500.0, 0.0,
                         0.0, 0.0, 100.0;
     vehicle.centerOfPressure = Eigen::Vector3d(0.0, 0.0, -1.0); // Assuming the center of pressure is 1 m behind the center of mass 

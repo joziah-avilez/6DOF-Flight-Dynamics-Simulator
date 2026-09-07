@@ -16,7 +16,7 @@ struct Vehicle
     double rollDampingCoefficient;
     double referenceLength;
     double referenceDiameter;
-    Eigen::Matrix3d inertia;
+    Eigen::Matrix3d initialInertia;
     Eigen::Vector3d torque;
     Eigen::Vector3d centerOfPressure;
 };
