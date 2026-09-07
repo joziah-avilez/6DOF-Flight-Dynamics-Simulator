@@ -6,22 +6,9 @@
 #include "Vehicle.hpp"
 #include "Environment.hpp"
 
-State eulerStep(const State& state, const Vehicle& vehicle, const Environment& environment, double dt)
+State rk4Step(const State& state, const Vehicle& vehicle, const Environment& environment, double time, double dt)
 {
-    StateDerivative dxdt = derivatives(state, vehicle, environment);
-
-    State nextState;
-
-    nextState.position = state.position + dt * dxdt.position;
-    nextState.velocity = state.velocity + dt * dxdt.velocity;
-    nextState.orientation = state.orientation;
-
-    return nextState;
-}
-
-State rk4Step(const State& state, const Vehicle& vehicle, const Environment& environment, double dt)
-{
-    StateDerivative k1 = derivatives(state, vehicle, environment);
+    StateDerivative k1 = derivatives(state, vehicle, environment, time);
 
     State state2;
     state2.position = state.position + 0.5 * dt * k1.position;
@@ -29,7 +16,7 @@ State rk4Step(const State& state, const Vehicle& vehicle, const Environment& env
     state2.orientation.coeffs() = state.orientation.coeffs() + 0.5 * dt * k1.orientation.coeffs();
     state2.orientation.normalize();
     state2.angularVelocity = state.angularVelocity + 0.5 * dt * k1.angularVelocity;
-    StateDerivative k2 = derivatives(state2, vehicle, environment);
+    StateDerivative k2 = derivatives(state2, vehicle, environment, time + 0.5 * dt);
 
     State state3;
     state3.position = state.position + 0.5 * dt * k2.position;
@@ -37,7 +24,7 @@ State rk4Step(const State& state, const Vehicle& vehicle, const Environment& env
     state3.orientation.coeffs() = state.orientation.coeffs() + 0.5 * dt * k2.orientation.coeffs();
     state3.orientation.normalize();
     state3.angularVelocity = state.angularVelocity + 0.5 * dt * k2.angularVelocity;
-    StateDerivative k3 = derivatives(state3, vehicle, environment);
+    StateDerivative k3 = derivatives(state3, vehicle, environment, time + 0.5 * dt);
 
     State state4;
     state4.position = state.position + dt * k3.position;
@@ -45,7 +32,7 @@ State rk4Step(const State& state, const Vehicle& vehicle, const Environment& env
     state4.orientation.coeffs() = state.orientation.coeffs() + dt * k3.orientation.coeffs();
     state4.orientation.normalize();
     state4.angularVelocity = state.angularVelocity + dt * k3.angularVelocity;
-    StateDerivative k4 = derivatives(state4, vehicle, environment);
+    StateDerivative k4 = derivatives(state4, vehicle, environment, time + dt);
 
     State nextState;
 

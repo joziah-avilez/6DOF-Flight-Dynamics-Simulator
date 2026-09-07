@@ -46,6 +46,7 @@ int main()
     Vehicle vehicle;
     vehicle.mass = 1000.0; // kg
     vehicle.thrust = 12000.0; // N
+    vehicle.burnTime = 5.0; // s
     vehicle.referenceLength = 5.0; // m
     vehicle.referenceDiameter = 1.0; // m
     vehicle.axialArea = M_PI * (0.5 * vehicle.referenceDiameter) * (0.5 * vehicle.referenceDiameter); // m^2
@@ -75,11 +76,10 @@ int main()
 
     while (t < tFinal)
     {
-        state = rk4Step(state, vehicle, environment, dt);
+        state = rk4Step(state, vehicle, environment, t, dt);
         t += dt;
 
         writeState(outputFile, t, state);
-
     }
 
     outputFile.close();

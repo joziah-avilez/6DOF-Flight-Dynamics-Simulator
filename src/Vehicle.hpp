@@ -5,6 +5,7 @@ struct Vehicle
 {
     double mass;
     double thrust;
+    double burnTime;
     double axialArea;
     double lateralArea;
     double axialDragCoefficient;

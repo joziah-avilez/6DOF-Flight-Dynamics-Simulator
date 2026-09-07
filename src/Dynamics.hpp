@@ -9,7 +9,7 @@
 #include "Vehicle.hpp"
 #include "Environment.hpp"
 
-StateDerivative derivatives(const State& state, const Vehicle& vehicle, const Environment& environment)
+StateDerivative derivatives(const State& state, const Vehicle& vehicle, const Environment& environment, double time)
 {
     // Retrieve environmental parameters
     const double gravity = environment.gravity;
@@ -41,7 +41,8 @@ StateDerivative derivatives(const State& state, const Vehicle& vehicle, const En
 
     // Calculate forces
     Eigen::Vector3d gravityForce(0, 0, -vehicle.mass * gravity);
-    Eigen::Vector3d thrustBody(0, 0, vehicle.thrust);
+    double currentThrust = (time < vehicle.burnTime) ? vehicle.thrust : 0.0;
+    Eigen::Vector3d thrustBody(0, 0, currentThrust);
     Eigen::Vector3d thrustForce = state.orientation * thrustBody;
     Eigen::Vector3d aerodynamicForceBody = axialDragBody + lateralDragBody;
     Eigen::Vector3d aerodynamicForce = state.orientation * aerodynamicForceBody;
