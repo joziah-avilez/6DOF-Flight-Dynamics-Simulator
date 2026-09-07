@@ -13,7 +13,8 @@ StateDerivative derivatives(const State& state, const Vehicle& vehicle, const En
 {
     // Retrieve environmental parameters
     const double gravity = environment.gravity;
-    const double airDensity = environment.airDensity;
+    const double altitude = state.position.z();
+    const double airDensity = environment.airDensity(altitude);
 
     // Calculate air-relative velocity
     Eigen::Vector3d airRelativeVelocity = state.velocity - environment.windVelocity;

@@ -38,8 +38,9 @@ int main()
     state.angularVelocity = Eigen::Vector3d(0.0, 0.0, 0.0);
 
     Environment environment;
-    environment.gravity = 9.81;
-    environment.airDensity = 1.225;
+    environment.gravity = 9.81; // m/s^2
+    environment.seaLevelAirDensity = 1.225; // kg/m^3
+    environment.scaleHeight = 8500.0; // m
     environment.windVelocity = Eigen::Vector3d::Zero();
 
     Vehicle vehicle;
